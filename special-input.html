@@ -1,0 +1,70 @@
+<template>
+
+</template><script>
+	var SpecialInputProto = Object.create(HTMLElement.prototype);
+
+	SpecialInputProto.createdCallback = function () {
+
+		var self = this;
+		// getting initial value of value attribute
+		var value = this.hasAttribute('input') ?
+				this.getAttribute('input') : '';
+
+//		var template = document.querySelector('template').content;
+		var template = this;
+
+		var options = value.split(',');
+		var wrapper, input, span;
+		wrapper = document.createElement('div');
+		for(var i = 0, l = options.length; i < l; i++) {
+			input = document.createElement("input");
+			input.setAttribute('type', 'checkbox');
+			input.setAttribute('value', options[i]);
+			span = document.createElement("span");
+			span.innerHTML = options[i] + "<br />";
+			wrapper.appendChild(input);
+			wrapper.appendChild(span);
+		}
+
+		var button = document.createElement('button');
+		button.setAttribute('value', 'submit');
+		button.setAttribute('onclick', 'clicking()');
+		wrapper.appendChild(button);
+
+		var shadowRoot = this.createShadowRoot();
+		shadowRoot.appendChild(wrapper.cloneNode(true));
+
+		shadowRoot.querySelector('input')
+				.addEventListener('input', function (e) {
+					this.setAttribute('value', e.target.value);
+				}.bind(this));
+
+		document.clicking = function() {
+			var options = shadowRoot.querySelectorAll('input');
+			var output = "";
+			for (var i = 0, l = options.length; i < l; i++) {
+				if (options[i].checked === true) {
+					output += options[i].value;
+				}
+			}
+			self.setAttribute('output', output);
+		}
+
+	};
+
+
+	//		SpecialInputProto.attributeChangedCallback = function (name, oldValue, newValue) {
+
+	//			if (name === 'value2') {
+	//				this.shadowRoot.querySelector('input').value = newValue;
+	//			}
+	//			if (name === 'input') {
+	//				var template = document.querySelector('template').content;
+	//				template.querySelector('input').value = newValue;
+	//			}
+	//		};
+	document.registerElement('special-input', {
+		prototype: SpecialInputProto
+	});
+
+</script>
